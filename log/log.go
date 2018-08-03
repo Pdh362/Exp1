@@ -9,21 +9,11 @@ import (
 
 var Standard = logrus.New()
 
-func InitLog(logfile string, app string, desc string) {
+func InitLog(app string, desc string) {
 	Standard.Out = os.Stdout
 	Standard.Formatter = &logrus.TextFormatter{ForceColors: true, FullTimestamp: true}
 
 	// logrus.SetFormatter(&logrus.JSONFormatter{})
-
-	// If logfile specified, create the file to log to,
-	// and inform the logger. Switch to text format as well.
-	if logfile != "" {
-		file, err := os.OpenFile(logfile, os.O_CREATE|os.O_WRONLY, 0666)
-		if err == nil {
-			Standard.Out = file
-			Standard.Formatter = &logrus.TextFormatter{}
-		}
-	}
 
 	// Wire up the standard log code to this writer
 	standardLogger.SetOutput(Standard.Writer())

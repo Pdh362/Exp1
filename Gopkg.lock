@@ -2,10 +2,40 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/gin-contrib/sse"
+  packages = ["."]
+  revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
+
+[[projects]]
+  name = "github.com/gin-gonic/gin"
+  packages = [".","binding","render"]
+  revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
+  version = "v1.2"
+
+[[projects]]
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
   version = "v1.0.6"
+
+[[projects]]
+  name = "github.com/ugorji/go"
+  packages = ["codec"]
+  revision = "b4c50a2b199d93b13dc15e78929cfb23bfdf21ab"
+  version = "v1.1.1"
 
 [[projects]]
   branch = "master"
@@ -19,9 +49,21 @@
   packages = ["unix","windows"]
   revision = "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe"
 
+[[projects]]
+  name = "gopkg.in/go-playground/validator.v8"
+  packages = ["."]
+  revision = "5f1438d3fca68893a817e4a66806cea46a9e4ebf"
+  version = "v8.18.2"
+
+[[projects]]
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9a4df6c2b9cbc7b6a8c1f52444dc0bace4dc5e03a39109d0e2f7956c62319982"
+  inputs-digest = "53cb01a22ad1c93f3ae0a126b5310b5e828eb8c2b05d415d90ca204577c391db"
   solver-name = "gps-cdcl"
   solver-version = 1

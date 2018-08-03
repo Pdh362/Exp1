@@ -2,22 +2,58 @@
 
 
 [[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dustin/go-broadcast"
+  packages = ["."]
+  revision = "f664265f5a662fb4d1df7f3533b1e8d0e0277120"
+
+[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   revision = "22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae"
 
 [[projects]]
+  name = "github.com/gin-gonic/autotls"
+  packages = ["."]
+  revision = "5b3297bdcee778ff3bbdc99ab7c41e1c2677d22d"
+  version = "0.0.1"
+
+[[projects]]
   name = "github.com/gin-gonic/gin"
-  packages = [".","binding","render"]
+  packages = [".","binding","binding/example","render"]
   revision = "d459835d2b077e44f7c9b453505ee29881d5d12d"
   version = "v1.2"
 
 [[projects]]
   name = "github.com/golang/protobuf"
-  packages = ["proto"]
+  packages = ["conformance/internal/conformance_proto","descriptor","jsonpb","jsonpb/jsonpb_test_proto","proto","proto/proto3_proto","proto/test_proto","protoc-gen-go/descriptor","protoc-gen-go/generator","protoc-gen-go/generator/internal/remap","protoc-gen-go/grpc","protoc-gen-go/plugin","ptypes","ptypes/any","ptypes/duration","ptypes/struct","ptypes/timestamp","ptypes/wrappers"]
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/kr/pretty"
+  packages = ["."]
+  revision = "73f6ac0b30a98e433b289500d779f50c1a6f0712"
+  version = "v0.1.0"
+
+[[projects]]
+  name = "github.com/kr/text"
+  packages = ["."]
+  revision = "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f"
+  version = "v0.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/manucorporat/stats"
+  packages = ["."]
+  revision = "3ba42d56d227cf2a6086b63baba5e00669235853"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
@@ -26,10 +62,28 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
+
+[[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "3e01752db0189b9157070a0e1668a620f9a85da2"
   version = "v1.0.6"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
 
 [[projects]]
   name = "github.com/ugorji/go"
@@ -40,14 +94,56 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = ["acme","acme/autocert","acme/autocert/internal/acmetest","blake2b","curve25519","ed25519","ed25519/internal/edwards25519","internal/chacha20","internal/subtle","nacl/auth","pkcs12/internal/rc2","poly1305","ssh","ssh/terminal"]
   revision = "56440b844dfe139a8ac053f4ecac0b20b79058f4"
 
 [[projects]]
   branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "f4c29de78a2a91c00474a2e689954305c350adf9"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sync"
+  packages = ["errgroup"]
+  revision = "1d60e4601c6fd243af51cc01ddf169918a5407ca"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = ["cpu","unix","windows","windows/registry","windows/svc","windows/svc/debug","windows/svc/eventlog","windows/svc/mgr"]
   revision = "0ffbfd41fbef8ffcf9b62b0b0aa3a5873ed7a4fe"
+
+[[projects]]
+  branch = "master"
+  name = "google.golang.org/genproto"
+  packages = ["protobuf/field_mask"]
+  revision = "daca94659cb50e9f37c1b834680f2e46358f10b0"
+
+[[projects]]
+  name = "gopkg.in/airbrake/gobrake.v2"
+  packages = ["."]
+  revision = "668876711219e8b0206e2994bf0a59d889c775aa"
+  version = "v2.0.9"
+
+[[projects]]
+  branch = "v1"
+  name = "gopkg.in/check.v1"
+  packages = ["."]
+  revision = "788fd78401277ebd861206a03c884797c6ec5541"
+
+[[projects]]
+  name = "gopkg.in/gemnasium/logrus-airbrake-hook.v2"
+  packages = ["."]
+  revision = "e928b033a891c0175fb643d5aa0779e86325eb12"
+  version = "v2.1.2"
+
+[[projects]]
+  name = "gopkg.in/go-playground/assert.v1"
+  packages = ["."]
+  revision = "4f4dfbc7d1c48336cf93399deae81aa9067e88af"
+  version = "v1.2.1"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -64,6 +160,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "53cb01a22ad1c93f3ae0a126b5310b5e828eb8c2b05d415d90ca204577c391db"
+  inputs-digest = "1395d514e94545d0337e4c252bb84301bbb189067759675553256a868deb40c7"
   solver-name = "gps-cdcl"
   solver-version = 1

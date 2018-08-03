@@ -10,6 +10,10 @@ func main() {
 	// Start up log
 	log.InitLog("EXP1", "Experiment")
 
-	app.Init()
+	err := app.Init("config.json")
+	if err != nil {
+		log.Standard.Fatal(err)
+	}
+
 	app.Run()
 }

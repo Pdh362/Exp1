@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/Pdh362/Exp1/config"
+	"github.com/Pdh362/Exp1/log"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -10,7 +11,6 @@ import (
 // ------------------------------------------------------------------------------------------------
 
 type cfg struct {
-	LogFile      string // File name for logs: empty means log to STDOUT
 	GinMode      string // Mode for Gin middleware
 	GinConnLimit int    // Master connection limit
 }
@@ -28,11 +28,15 @@ var Web *gin.Engine
 //
 //
 func Init(cFile string) error {
+	// Start up log
+	log.InitLog("EXP1", "Experiment")
+
 	// Read config
 	err := config.Read(cFile, &appConfig)
 	if err != nil {
 		return errors.Wrap(err, "App- Read config failed")
 	}
+
 	// Fire up Gin, for serving http
 	gin.SetMode(appConfig.GinMode)
 	Web = gin.New()

@@ -13,8 +13,6 @@ func InitLog(app string, desc string) {
 	Standard.Out = os.Stdout
 	Standard.Formatter = &logrus.TextFormatter{ForceColors: true, FullTimestamp: true}
 
-	// logrus.SetFormatter(&logrus.JSONFormatter{})
-
 	// Wire up the standard log code to this writer
 	standardLogger.SetOutput(Standard.Writer())
 

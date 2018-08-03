@@ -1,5 +1,4 @@
 {
   "GinMode": "debug",
-  "GinConnLimit": 16,
-  "LogFile": ""
+  "GinConnLimit": 16
 }

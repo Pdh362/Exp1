@@ -61,13 +61,7 @@ func Run() error {
 		return errors.Wrap(err, "App- Failed to start watcher")
 	}
 
-	// files := watcher.GetFileList()
-	log.Standard.Printf("Length of files = 0")
-
-	/* for k, v := range files {
-		log.Standard.Printf("key= %s, value= %s", k, v)
-	} */
-
 	Web.Run(":8000")
-	return nil
+
+	return watcher.StopWatcher()
 }

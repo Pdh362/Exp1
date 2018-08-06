@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/Pdh362/Exp1/config"
 	"github.com/Pdh362/Exp1/log"
+	"github.com/Pdh362/Exp1/watcher"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -41,6 +42,9 @@ func Init(cFile string) error {
 	gin.SetMode(appConfig.GinMode)
 	Web = gin.New()
 
+	// Middleware
+	Web.Use(gin.Recovery())
+
 	return nil
 }
 
@@ -52,5 +56,18 @@ func Init(cFile string) error {
 //
 func Run() error {
 
+	err := watcher.StartWatcher("./")
+	if err != nil {
+		return errors.Wrap(err, "App- Failed to start watcher")
+	}
+
+	// files := watcher.GetFileList()
+	log.Standard.Printf("Length of files = 0")
+
+	/* for k, v := range files {
+		log.Standard.Printf("key= %s, value= %s", k, v)
+	} */
+
+	Web.Run(":8000")
 	return nil
 }

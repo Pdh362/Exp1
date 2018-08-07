@@ -27,18 +27,20 @@ type DataPacket struct {
 
 func Results(c *gin.Context) {
 	// Copy our current list - mutex it!
-	r := DataPacket{
+	dpacket := DataPacket{
 		Results: contents,
 	}
-
 	// Convert the object into JSON
-	jres, err := json.Marshal(r)
+	jres, err := json.Marshal(dpacket)
+
 	// If something went wrong, report it
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+
+	log.Standard.Printf("Datapacket is %s", jres)
 
 	// Write the result out
 	c.JSON(http.StatusOK, string(jres))

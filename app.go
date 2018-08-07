@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/Pdh362/Exp1/config"
 	"github.com/Pdh362/Exp1/log"
+	"github.com/Pdh362/Exp1/master"
 	"github.com/Pdh362/Exp1/watcher"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
@@ -73,8 +74,9 @@ func CloseWatcher() error {
 
 // ------------------------------------------------------------------------------------------------
 func RunMaster() error {
+	Web.GET("/results", master.Results)
 
-	return nil
+	return Web.Run(":" + strconv.Itoa(config.MPort))
 }
 
 // ------------------------------------------------------------------------------------------------

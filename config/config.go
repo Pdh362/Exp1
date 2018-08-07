@@ -9,7 +9,7 @@ import (
 
 var Mode string
 var WPort int
-var SPort int
+var MPort int
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ func Read(path string, res interface{}) error {
 	// Command-line flag parsing
 	flag.StringVar(&Mode, "mode", "watcher", "choose from : watcher=monitor folder, master=serve results.")
 	flag.IntVar(&WPort, "Watch port", 8080, "Network port for a watcher to talk to the master")
-	flag.IntVar(&SPort, "Serve port", 80, "Network port for master to serve results to.")
+	flag.IntVar(&MPort, "Master port", 80, "Network port for master to serve results to.")
 
 	flag.Parse()
 

@@ -43,7 +43,7 @@ func Init(cFile string) error {
 	gin.SetMode(appConfig.GinMode)
 	Web = gin.New()
 
-	// Middleware
+	// Middleware - handles panics and restarts
 	Web.Use(gin.Recovery())
 
 	return nil

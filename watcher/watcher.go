@@ -8,23 +8,28 @@ import (
 	"time"
 )
 
+//----------------------------------------------------------------------------------------------------------------------
+//
+// Global variables
+//
 var folderWatcher fsnotify.Watcher
 var contents []string
 var watchPath string
 var dirtyFlag bool
+var ticker *time.Ticker
+
+//----------------------------------------------------------------------------------------------------------------------
 
 func logContents() {
 	log.Standard.Printf("%v", contents)
 }
 
-func StopWatcher() error {
-	err := folderWatcher.Close()
-	if err != nil {
-		return errors.Wrap(err, "StopWatcher: Failed to close watch object")
-	}
-	return nil
-}
-
+//----------------------------------------------------------------------------------------------------------------------
+//
+// BuildDirFiles:
+//
+// Rebuild the contents of the specified directory
+//
 func BuildDirFiles(path string) error {
 	c, err := ioutil.ReadDir(path)
 
@@ -38,6 +43,7 @@ func BuildDirFiles(path string) error {
 	return err
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 //
 // StartWatcher:
 //
@@ -57,21 +63,22 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 	watchPath = p
 	dirtyFlag = true
 
+	// Create a watcher, that monitors the specified folder.
 	FolderWatcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return errors.Wrap(err, "StartWatcher: Failed to create NewWatcher")
 	}
 
 	// Create a ticker that checks our dirty flag, and updates if needed.
-	ticker := time.NewTicker(refreshRate)
+	ticker = time.NewTicker(refreshRate)
 	go func() {
 		// I'm not too happy about using range like this: the select statement is more appropriate,
 		// but appears to blocking once one value is received. Investigate?
 		for t := range ticker.C {
 			t = t
-			// log.Standard.Println("Tick: " , t)
-			// Check whether we need an update
+			// Check whether an update has been flagged
 			if dirtyFlag == true {
+				// It has: reset the flag, and rebuild the folder contents
 				dirtyFlag = false
 				err = BuildDirFiles(watchPath)
 			}
@@ -84,7 +91,7 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 			select {
 			case ev := <-FolderWatcher.Events:
 				// We'll flag an update only for these specific file system events.
-				// Others don't affect the directory contents, and can be ignored.
+				// Others don't affect the folder contents, and can be ignored.
 				switch ev.Op {
 				case fsnotify.Create:
 					dirtyFlag = true
@@ -92,17 +99,38 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 					dirtyFlag = true
 				}
 
+			// Trap any errors, and log them
 			case err := <-FolderWatcher.Errors:
 				log.Standard.Println("error:", err)
 			}
 		}
 	}()
 
+	// Add the folder to watch, which will start the watching process.
 	err = FolderWatcher.Add(watchPath)
 	if err != nil {
 		return errors.Wrap(err, "StartWatcher: Failed to add directory to watcher: "+watchPath)
-		log.Standard.Fatal(err)
 	}
+
+	return nil
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//
+// StopWatcher:
+//
+// Cleanup and shutdown the watcher.
+//
+func StopWatcher() error {
+
+	// Close down the folder watcher
+	err := folderWatcher.Close()
+	if err != nil {
+		return errors.Wrap(err, "StopWatcher: Failed to close watch object")
+	}
+
+	// Close the ticker
+	ticker.Stop()
 
 	return nil
 }

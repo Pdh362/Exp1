@@ -66,7 +66,7 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 	ticker := time.NewTicker(refreshRate)
 	go func() {
 		// I'm not too happy about using range like this: the select statement is more appropriate,
-		// but appears to blocking once one value is received.
+		// but appears to blocking once one value is received. Investigate?
 		for t := range ticker.C {
 			t = t
 			// log.Standard.Println("Tick: " , t)
@@ -83,9 +83,9 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 		for {
 			select {
 			case ev := <-FolderWatcher.Events:
-				// fileSystemEvent(ev)
+				// We'll flag an update only for these specific file system events.
+				// Others don't affect the directory contents, and can be ignored.
 				switch ev.Op {
-				// Add a file
 				case fsnotify.Create:
 					dirtyFlag = true
 				case fsnotify.Remove:
@@ -97,12 +97,6 @@ func StartWatcher(p string, refreshRate time.Duration) error {
 			}
 		}
 	}()
-
-	// Construct a list of files in the directory
-	err = BuildDirFiles(watchPath)
-	if err != nil {
-		return errors.Wrap(err, "StartWatcher: Failed to scan directory for files: "+watchPath)
-	}
 
 	err = FolderWatcher.Add(watchPath)
 	if err != nil {

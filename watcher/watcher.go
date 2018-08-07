@@ -5,69 +5,13 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
 	"io/ioutil"
+	"time"
 )
 
 var folderWatcher fsnotify.Watcher
 var contents []string
 var watchPath string
-
-func Index(t string) int {
-	for i, v := range contents {
-		if v == t {
-			return i
-		}
-	}
-	return -1
-}
-
-func addFile(path string) error {
-	// Check we don't already have this file (could happen!)
-	for _, v := range contents {
-		if v == path {
-			logContents()
-			return nil
-		}
-	}
-
-	// Append to the end of the array.
-	contents = append(contents, path)
-
-	logContents()
-	return nil
-}
-
-func removeFile(path string) error {
-	i := Index(path)
-	if i == -1 {
-		return errors.New("StopWatcher: Failed to close watch object")
-	}
-
-	// This is idiomatic Go, but certainly looks inefficient to me. BUT, it avoids a re-sort.
-	// See https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-array-in-golang/37335777
-
-	// We are removing an element from the slice, in this case the file just deleted.
-	contents = append(contents[:i], contents[i+1:]...)
-
-	logContents()
-	return nil
-}
-
-func EventOccurred(event fsnotify.Event) {
-	log.Standard.Println("event:", event)
-
-	// These events alter the directory contents - so, we need to update our directory listing
-	switch event.Op {
-	// Add a file
-	case fsnotify.Create:
-		addFile(event.Name)
-	// Remove an entry
-	case fsnotify.Remove:
-		removeFile(event.Name)
-	// A rename is always followed by a CREATE event, so we'll act as if the original file is removed.
-	case fsnotify.Rename:
-		removeFile(event.Name)
-	}
-}
+var dirtyFlag bool
 
 func logContents() {
 	log.Standard.Printf("%v", contents)
@@ -94,20 +38,60 @@ func BuildDirFiles(path string) error {
 	return err
 }
 
-func StartWatcher(p string) error {
+//
+// StartWatcher:
+//
+// Start up a watcher. This works in 2 steps :-
+//
+// 1 -	A file system notification uses a channel to trigger events that 'something' has changed in the directory.
+//		A 'dirty' flag is set to true, to indicate that we need to rebuild the directory listing.
+//
+// 2 -	A ticker channel receives updates every X microseconds, and checks the dirty flag.
+// 		If true, set it back to false and rebuild our list of files.
+//
+// The benefit of decoupling the directory update from the file system notification, is that we can throttle how
+// often the update occurs. An optimal algorithm would dynamically adjust this value, based on the workload of the
+// service - but for this example, it is fixed.
+//
+func StartWatcher(p string, refreshRate time.Duration) error {
 	watchPath = p
+	dirtyFlag = true
 
 	FolderWatcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return errors.Wrap(err, "StartWatcher: Failed to create NewWatcher")
 	}
 
+	// Create a ticker that checks our dirty flag, and updates if needed.
+	ticker := time.NewTicker(refreshRate)
+	go func() {
+		// I'm not too happy about using range like this: the select statement is more appropriate,
+		// but appears to blocking once one value is received.
+		for t := range ticker.C {
+			t = t
+			// log.Standard.Println("Tick: " , t)
+			// Check whether we need an update
+			if dirtyFlag == true {
+				dirtyFlag = false
+				err = BuildDirFiles(watchPath)
+			}
+		}
+	}()
+
 	// Channel function to handle incoming file change events.
 	go func() {
 		for {
 			select {
 			case ev := <-FolderWatcher.Events:
-				EventOccurred(ev)
+				// fileSystemEvent(ev)
+				switch ev.Op {
+				// Add a file
+				case fsnotify.Create:
+					dirtyFlag = true
+				case fsnotify.Remove:
+					dirtyFlag = true
+				}
+
 			case err := <-FolderWatcher.Errors:
 				log.Standard.Println("error:", err)
 			}

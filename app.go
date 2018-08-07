@@ -6,6 +6,7 @@ import (
 	"github.com/Pdh362/Exp1/watcher"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"time"
 )
 
 // ------------------------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ func Init(cFile string) error {
 //
 func Run() error {
 
-	err := watcher.StartWatcher("./")
+	err := watcher.StartWatcher("./", 500*time.Millisecond)
 	if err != nil {
 		return errors.Wrap(err, "App- Failed to start watcher")
 	}

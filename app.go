@@ -6,6 +6,8 @@ import (
 	"github.com/Pdh362/Exp1/watcher"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -31,7 +33,7 @@ var Web *gin.Engine
 //
 func Init(cFile string) error {
 	// Start up log
-	log.InitLog("EXP1", "Experiment")
+	log.InitLog("EXP1", "Folder Watch")
 
 	// Read config
 	err := config.Read(cFile, &appConfig)
@@ -50,19 +52,61 @@ func Init(cFile string) error {
 }
 
 // ------------------------------------------------------------------------------------------------
-//
-// Run:
-//
-// This function will fire up the web server, and hence block unless something goes wrong.
-//
-func Run() error {
+func RunWatcher() error {
+
+	// Watch specific init
+	// Expose an endpoint that the master can call to get results.
+	Web.GET("/results", watcher.Results)
 
 	err := watcher.StartWatcher("./", 500*time.Millisecond)
 	if err != nil {
 		return errors.Wrap(err, "App- Failed to start watcher")
 	}
 
-	Web.Run(":8000")
+	return Web.Run(":" + strconv.Itoa(config.WPort))
+}
 
+// ------------------------------------------------------------------------------------------------
+func CloseWatcher() error {
 	return watcher.StopWatcher()
+}
+
+// ------------------------------------------------------------------------------------------------
+func RunMaster() error {
+
+	return nil
+}
+
+// ------------------------------------------------------------------------------------------------
+func CloseMaster() error {
+
+	return nil
+}
+
+// ------------------------------------------------------------------------------------------------
+//
+// Run:
+//
+// This function will fire up the web server, and hence block unless something goes wrong.
+//
+func Run() error {
+	var err error
+
+	switch strings.ToLower(config.Mode) {
+
+	case "watcher":
+		err = RunWatcher()
+	case "master":
+		err = RunMaster()
+	}
+
+	switch strings.ToLower(config.Mode) {
+
+	case "watcher":
+		err = CloseWatcher()
+	case "master":
+		err = CloseMaster()
+	}
+
+	return err
 }

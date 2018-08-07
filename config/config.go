@@ -2,9 +2,14 @@ package config
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/pkg/errors"
 	"os"
 )
+
+var Mode string
+var WPort int
+var SPort int
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
@@ -12,6 +17,7 @@ import (
 // ReadConfig:
 //
 // Reads configuration from a json file
+// These hold global config information, used in either mode that rarely are changed.
 //
 func Read(path string, res interface{}) error {
 
@@ -28,6 +34,13 @@ func Read(path string, res interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "ReadConfig - Config file json decode error:")
 	}
+
+	// Command-line flag parsing
+	flag.StringVar(&Mode, "mode", "watcher", "choose from : watcher=monitor folder, master=serve results.")
+	flag.IntVar(&WPort, "Watch port", 8080, "Network port for a watcher to talk to the master")
+	flag.IntVar(&SPort, "Serve port", 80, "Network port for master to serve results to.")
+
+	flag.Parse()
 
 	return nil
 }

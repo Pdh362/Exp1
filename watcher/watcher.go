@@ -1,10 +1,13 @@
 package watcher
 
 import (
+	"encoding/json"
 	"github.com/Pdh362/Exp1/log"
 	"github.com/fsnotify/fsnotify"
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"io/ioutil"
+	"net/http"
 	"time"
 )
 
@@ -17,6 +20,31 @@ var contents []string
 var watchPath string
 var dirtyFlag bool
 var ticker *time.Ticker
+
+type DataPacket struct {
+	Results []string
+}
+
+func Results(c *gin.Context) {
+	// Copy our current list - mutex it!
+	r := DataPacket{
+		Results: contents,
+	}
+
+	// Convert the object into JSON
+	jres, err := json.Marshal(r)
+	// If something went wrong, report it
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	// Write the result out
+	c.JSON(http.StatusOK, string(jres))
+
+	c.Next()
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 

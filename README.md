@@ -3,6 +3,8 @@
 ### Installation
 No libraries are required to run the final executable. 
 
+The golang tool _dep_ was used to handle dependencies. Golang 1.9 was used during development. 
+
 ### Usage
 
 The executable can be run in one of two modes :-

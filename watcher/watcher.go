@@ -24,20 +24,10 @@ var watchPath string
 var dirtyFlag bool
 var ticker *time.Ticker
 
-type DataPacket struct {
-	Results []string
-}
-
-func Results(c *gin.Context) {
-	// Copy our current list - mutex it!
-	dpacket := contents
-	token := c.Query("token")
-
-	log.Standard.Printf("Datapacket is %s", dpacket)
-
-	// Write the result out
-	c.JSON(http.StatusOK, gin.H{"token": token, "results": dpacket})
-
+func Ping(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"response": "pong",
+	})
 	c.Next()
 }
 
@@ -51,16 +41,19 @@ func PostWatcherResults() error {
 	jsonData := GetContents()
 	jsonVal, _ := json.Marshal(jsonData)
 
-	log.Standard.Printf("json data is %s", jsonVal)
+	// log.Standard.Printf("json data is %s", jsonVal)
 
-	addr := "http://localhost:" + strconv.Itoa(config.MPort) + "/results"
+	// Inform the master that we have updated results
+	addr := "http://localhost:" + strconv.Itoa(config.MPort) + "/update"
 	response, err := http.Post(addr, "application/json", bytes.NewBuffer(jsonVal))
 	if err != nil {
 		return errors.Wrap(err, "PostWatcherResults- Failed to post results")
 	}
-	data, _ := ioutil.ReadAll(response.Body)
 
+	// This would tell us if the server failed to respond
+	data, _ := ioutil.ReadAll(response.Body)
 	log.Standard.Printf("Response was :%s", data)
+
 	return nil
 }
 
@@ -84,7 +77,7 @@ func BuildDirFiles(path string) error {
 		contents[i] = v.Name()
 	}
 
-	logContents()
+	// logContents()
 	PostWatcherResults()
 
 	return err

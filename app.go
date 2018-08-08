@@ -55,11 +55,11 @@ func Init(cFile string) error {
 // ------------------------------------------------------------------------------------------------
 func RunWatcher() error {
 
-	// Watch specific init
-	// Expose an endpoint that the master can call to get results.
-	Web.GET("/results", watcher.Results)
+	// Expose an endpoint that exposes the results
+	// Not actually required, as
+	Web.GET("/ping", watcher.Ping)
 
-	err := watcher.StartWatcher("./", 500*time.Millisecond)
+	err := watcher.StartWatcher(config.WatchPath, 500*time.Millisecond)
 	if err != nil {
 		return errors.Wrap(err, "App- Failed to start watcher")
 	}
@@ -74,7 +74,8 @@ func CloseWatcher() error {
 
 // ------------------------------------------------------------------------------------------------
 func RunMaster() error {
-	Web.POST("/results", master.Results)
+	Web.POST("/update", master.Update)
+	Web.GET("/", master.Results)
 
 	return Web.Run(":" + strconv.Itoa(config.MPort))
 }
@@ -100,6 +101,10 @@ func Run() error {
 		err = RunWatcher()
 	case "master":
 		err = RunMaster()
+	}
+
+	if err != nil {
+		return errors.Wrap(err, "Error running app")
 	}
 
 	switch strings.ToLower(config.Mode) {

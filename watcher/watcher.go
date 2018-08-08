@@ -45,14 +45,14 @@ func PostWatcherResults() error {
 
 	// Inform the master that we have updated results
 	addr := "http://localhost:" + strconv.Itoa(config.MPort) + "/update"
-	response, err := http.Post(addr, "application/json", bytes.NewBuffer(jsonVal))
+	_, err := http.Post(addr, "application/json", bytes.NewBuffer(jsonVal))
 	if err != nil {
 		return errors.Wrap(err, "PostWatcherResults- Failed to post results")
 	}
 
 	// This would tell us if the server failed to respond
-	data, _ := ioutil.ReadAll(response.Body)
-	log.Standard.Printf("Response was :%s", data)
+	// data, _ := ioutil.ReadAll(response.Body)
+	// log.Standard.Printf("Response was :%s", data)
 
 	return nil
 }

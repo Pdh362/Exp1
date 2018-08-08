@@ -1,4 +1,4 @@
 {
-  "GinMode": "debug",
+  "GinMode": "release",
   "GinConnLimit": 16
 }

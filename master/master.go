@@ -8,19 +8,30 @@ import (
 )
 
 //----------------------------------------------------------------------------------------------------------------------
-
-var MasterList map[string][]string = make(map[string][]string)
+var CollatedList = make(map[string][]string)
 
 //----------------------------------------------------------------------------------------------------------------------
-
+// Update:
+//
+// Triggered when a request for the collated list is made.
+// Simply report it back as a json response
+//
 func Results(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"results": MasterList,
+		"results": CollatedList,
 	})
 	c.Next()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+// Update:
+//
+// Triggered when the master receives an update from a watcher.
+// Reform the posted data into a useful type, and send it over to UpdateFolder
+//
+// Not too happy with the data process below: given time, I'd optimise the data
+// sent by the watcher, as well as how I process the data here.
+//
 func Update(c *gin.Context) {
 
 	results, err := c.GetRawData()
@@ -47,9 +58,14 @@ func Update(c *gin.Context) {
 	UpdateFolder(jsonData["path"].(string), finalres)
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// UpdateFolder:
+//
+// Updates the global map that holds the collated information
+//
 func UpdateFolder(path string, results []string) {
 
 	// log.Standard.Printf("Path = %s, results = %s", path, results)
 
-	MasterList[path] = results
+	CollatedList[path] = results
 }

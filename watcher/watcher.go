@@ -24,6 +24,13 @@ var watchPath string
 var dirtyFlag bool
 var ticker *time.Ticker
 
+//----------------------------------------------------------------------------------------------------------------------
+// Ping:
+//
+// Doesn't do a great deal: simply responds back. Could be useful for the master to check for an active watcher:
+// we could send back some useful information for the master.
+// Not essential, but i'm leaving this here just in case.
+//
 func Ping(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"response": "pong",
@@ -31,12 +38,21 @@ func Ping(c *gin.Context) {
 	c.Next()
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// GetContents:
+//
 func GetContents() gin.H {
 	return gin.H{
 		"path":    watchPath,
 		"results": contents}
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+// PostWatcherResults:
+//
+// This function sends a http post to the master, with the updated directory listing.
+// It doesn't do anything if a bad response is sent back: probably should flag for a counted retry?
+//
 func PostWatcherResults() error {
 	jsonData := GetContents()
 	jsonVal, _ := json.Marshal(jsonData)
@@ -55,12 +71,6 @@ func PostWatcherResults() error {
 	// log.Standard.Printf("Response was :%s", data)
 
 	return nil
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-
-func logContents() {
-	log.Standard.Printf("%v", contents)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,7 +103,7 @@ func BuildDirFiles(path string) error {
 //		A 'dirty' flag is set to true, to indicate that we need to rebuild the directory listing.
 //
 // 2 -	A ticker channel receives updates every X microseconds, and checks the dirty flag.
-// 		If true, set it back to false and rebuild our list of files.
+// 		If true, set it back to false and rebuilds our list of files.
 //
 // The benefit of decoupling the directory update from the file system notification, is that we can throttle how
 // often the update occurs. An optimal algorithm would dynamically adjust this value, based on the workload of the

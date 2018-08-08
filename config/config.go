@@ -11,6 +11,7 @@ var Mode string
 var WPort int
 var MPort int
 var WatchPath string
+var RefreshRate int
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
@@ -38,9 +39,10 @@ func Read(path string, res interface{}) error {
 
 	// Command-line flag parsing
 	flag.StringVar(&Mode, "mode", "watcher", "choose from : watcher=monitor folder, master=serve results.")
+	flag.StringVar(&WatchPath, "watch", "./", "Directory for the watcher to monitor")
 	flag.IntVar(&WPort, "wport", 8000, "Network port for a watcher to talk to the master")
 	flag.IntVar(&MPort, "mport", 90, "Network port for master to serve results to.")
-	flag.StringVar(&WatchPath, "watch", "./", "Directory for the watcher to monitor")
+	flag.IntVar(&RefreshRate, "refresh", 500, "Speed that the watcher refreshes at, in milliseconds")
 
 	flag.Parse()
 

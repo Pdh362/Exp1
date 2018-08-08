@@ -13,11 +13,9 @@ import (
 )
 
 // ------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------
-
 type cfg struct {
-	GinMode      string // Mode for Gin middleware
-	GinConnLimit int    // Master connection limit
+	GinMode          string // Mode for Gin middleware
+	DisableTimeStamp bool   // Whether to log timestamps
 }
 
 var appConfig cfg
@@ -25,22 +23,24 @@ var appConfig cfg
 var Web *gin.Engine
 
 // ------------------------------------------------------------------------------------------------
-// ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
 //
 // Init:
 //
+// Initialise the common elements of both a master/watcher.
 //
 func Init(cFile string) error {
-	// Start up log
-	log.InitLog("EXP1", "Folder Watch")
-
 	// Read config
 	err := config.Read(cFile, &appConfig)
 	if err != nil {
 		return errors.Wrap(err, "App- Read config failed")
 	}
+
+	// Start up log code
+	log.InitLog("EXP1", "Folder Watch", appConfig.DisableTimeStamp)
+
+	log.Standard.Printf("[%s mode][mport=%v][wport=%v]", config.Mode, config.MPort, config.WPort)
 
 	// Fire up Gin, for serving http
 	gin.SetMode(appConfig.GinMode)
@@ -53,13 +53,18 @@ func Init(cFile string) error {
 }
 
 // ------------------------------------------------------------------------------------------------
+// RunWatcher:
+//
+// Main run loop when in 'watcher' mode.
+// Will usually block until error/restart/panic occurs.
+//
 func RunWatcher() error {
 
 	// Expose an endpoint that exposes the results
 	// Not actually required, as
 	Web.GET("/ping", watcher.Ping)
 
-	err := watcher.StartWatcher(config.WatchPath, 500*time.Millisecond)
+	err := watcher.StartWatcher(config.WatchPath, time.Duration(config.RefreshRate)*time.Millisecond)
 	if err != nil {
 		return errors.Wrap(err, "App- Failed to start watcher")
 	}
@@ -68,11 +73,20 @@ func RunWatcher() error {
 }
 
 // ------------------------------------------------------------------------------------------------
+// CloseWatcher:
+//
+// Close down when in 'watcher' mode.
+//
 func CloseWatcher() error {
 	return watcher.StopWatcher()
 }
 
 // ------------------------------------------------------------------------------------------------
+// Runmaster:
+//
+// Main run loop when in 'master' mode.
+// Will usually block until error/restart/panic occurs.
+//
 func RunMaster() error {
 	Web.POST("/update", master.Update)
 	Web.GET("/", master.Results)
@@ -81,6 +95,10 @@ func RunMaster() error {
 }
 
 // ------------------------------------------------------------------------------------------------
+// CloseMaster:
+//
+// Close down when in 'master' mode.
+//
 func CloseMaster() error {
 
 	return nil
@@ -90,7 +108,7 @@ func CloseMaster() error {
 //
 // Run:
 //
-// This function will fire up the web server, and hence block unless something goes wrong.
+// Run, and the close down, the code relevant to the mode we are running.
 //
 func Run() error {
 	var err error

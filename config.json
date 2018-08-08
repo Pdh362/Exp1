@@ -1,4 +1,4 @@
 {
   "GinMode": "release",
-  "GinConnLimit": 16
+  "DisableTimeStamp": true
 }

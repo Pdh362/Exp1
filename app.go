@@ -74,7 +74,7 @@ func CloseWatcher() error {
 
 // ------------------------------------------------------------------------------------------------
 func RunMaster() error {
-	Web.GET("/results", master.Results)
+	Web.POST("/results", master.Results)
 
 	return Web.Run(":" + strconv.Itoa(config.MPort))
 }

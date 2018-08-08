@@ -1,13 +1,16 @@
 package watcher
 
 import (
+	"bytes"
 	"encoding/json"
+	"github.com/Pdh362/Exp1/config"
 	"github.com/Pdh362/Exp1/log"
 	"github.com/fsnotify/fsnotify"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -27,25 +30,38 @@ type DataPacket struct {
 
 func Results(c *gin.Context) {
 	// Copy our current list - mutex it!
-	dpacket := DataPacket{
-		Results: contents,
-	}
-	// Convert the object into JSON
-	jres, err := json.Marshal(dpacket)
+	dpacket := contents
+	token := c.Query("token")
 
-	// If something went wrong, report it
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	log.Standard.Printf("Datapacket is %s", jres)
+	log.Standard.Printf("Datapacket is %s", dpacket)
 
 	// Write the result out
-	c.JSON(http.StatusOK, string(jres))
+	c.JSON(http.StatusOK, gin.H{"token": token, "results": dpacket})
 
 	c.Next()
+}
+
+func GetContents() gin.H {
+	return gin.H{
+		"path":    watchPath,
+		"results": contents}
+}
+
+func PostWatcherResults() error {
+	jsonData := GetContents()
+	jsonVal, _ := json.Marshal(jsonData)
+
+	log.Standard.Printf("json data is %s", jsonVal)
+
+	addr := "http://localhost:" + strconv.Itoa(config.MPort) + "/results"
+	response, err := http.Post(addr, "application/json", bytes.NewBuffer(jsonVal))
+	if err != nil {
+		return errors.Wrap(err, "PostWatcherResults- Failed to post results")
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+
+	log.Standard.Printf("Response was :%s", data)
+	return nil
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,6 +85,7 @@ func BuildDirFiles(path string) error {
 	}
 
 	logContents()
+	PostWatcherResults()
 
 	return err
 }

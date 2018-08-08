@@ -37,8 +37,8 @@ func Read(path string, res interface{}) error {
 
 	// Command-line flag parsing
 	flag.StringVar(&Mode, "mode", "watcher", "choose from : watcher=monitor folder, master=serve results.")
-	flag.IntVar(&WPort, "Watch port", 8080, "Network port for a watcher to talk to the master")
-	flag.IntVar(&MPort, "Master port", 80, "Network port for master to serve results to.")
+	flag.IntVar(&WPort, "wport", 8080, "Network port for a watcher to talk to the master")
+	flag.IntVar(&MPort, "mport", 90, "Network port for master to serve results to.")
 
 	flag.Parse()
 
